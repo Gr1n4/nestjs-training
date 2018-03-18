@@ -1,0 +1,25 @@
+version: '3'
+services:
+  postgres:
+    build: ./docker/postgres
+    ports:
+     - "49153:5432"
+    volumes:
+      - ./docker/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    env_file: ./docker/postgres/.env
+  web:
+    build: ./
+    links:
+     - postgres
+    ports:
+     - 127.0.0.1:1337:1337
+    volumes:
+     - ./:/usr/src/app
+    command: ["npm", "start"]
+  nginx:
+    build: ./docker/nginx
+    links:
+      - web
+    ports:
+      - "80:80"
+    env_file: ./docker/nginx/.env
